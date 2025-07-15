@@ -15,6 +15,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Calculadora de propinas"/>
+
+        <TextView
+            android:id="@+id/txtAnteriorPorcentaje"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tu anterior porcentaje fue: "
+            android:visibility="gone"/>
+
         <EditText
             android:id="@+id/inputMontoTotal"
             android:layout_width="match_parent"
@@ -52,7 +64,22 @@
                 android:layout_height="wrap_content"
                 android:checked="false"
                 android:text="20%" />
+            <RadioButton
+                android:id="@+id/rBtn_personalizado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="Otra cantidad" />
         </RadioGroup>
+
+        <EditText
+            android:id="@+id/edTxtCantidadPorcentajePersonalizada"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="¿Diferente porcentaje?"
+            android:gravity="center"
+            android:inputType="number"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/txtPropina"
