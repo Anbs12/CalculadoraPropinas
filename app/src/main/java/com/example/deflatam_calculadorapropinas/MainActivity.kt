@@ -1,5 +1,6 @@
 package com.example.deflatam_calculadorapropinas
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -54,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         savePorcentaje = SavePorcentaje(this)
     }
 
+    /** Muestra el porcentaje anterior guardado en SharedPreferences */
+    @SuppressLint("SetTextI18n")
     fun mostrarPorcentajeAnterior(){
         val porcentajeAnterior = savePorcentaje.getPorcentaje()
         if (porcentajeAnterior != 0f) {
@@ -62,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** */
     fun initCalculosNecesarios() {
 
         //Valores obtenidos de los campos
@@ -114,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         mostrarPorcentajeAnterior()
     }
 
+    /**Controla la  visibilidad del campo de propina personalizada*/
     fun radioBtnListenerPropinaPersonalizada() {
         radioBtnGroupPorcentaje.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -140,6 +145,7 @@ class MainActivity : AppCompatActivity() {
         txtPropinaPersonalizada.visibility = TextView.GONE
     }
 
+    /**Para mostrar mensajes al usuario*/
     fun message(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
     }
