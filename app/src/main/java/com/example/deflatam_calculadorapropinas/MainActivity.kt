@@ -135,6 +135,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     fun limpiarCampos() {
         inputMontoTotal.text.clear()
         radioBtnGroupPorcentaje.clearCheck()
