@@ -1,3 +1,8 @@
+# Para ejecutar
+
+Compilar e instalar app en movil o emulador.
+
+ 
  # Ejercicio 1: Calculadora de Propinas
  
  Nivel: Básico
