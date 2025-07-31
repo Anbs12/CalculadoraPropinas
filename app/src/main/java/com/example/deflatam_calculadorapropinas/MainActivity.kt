@@ -2,6 +2,9 @@ package com.example.deflatam_calculadorapropinas
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioGroup
@@ -10,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.deflatam_calculadorapropinas.utils.CalculadoraUtils
 import com.example.deflatam_calculadorapropinas.utils.SavePorcentaje
+import androidx.core.view.isVisible
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,10 +29,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var savePorcentaje: SavePorcentaje
     private var optionPersonalizada = false
 
+    // Animaciones
+    private lateinit var fadeInAnimation: Animation
+    private lateinit var fadeOutAnimation: Animation
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        // Carga de las animaciones
+        fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
 
         initComponents()
         radioBtnListenerPropinaPersonalizada()
@@ -61,13 +73,14 @@ class MainActivity : AppCompatActivity() {
         val porcentajeAnterior = savePorcentaje.getPorcentaje()
         if (porcentajeAnterior != 0f) {
             txtPorcentajeAnterior.text = "Tu anterior propina fue de: $porcentajeAnterior%"
-            txtPorcentajeAnterior.visibility = TextView.VISIBLE
+            //txtPorcentajeAnterior.visibility = TextView.VISIBLE
+            showViewWithFade(txtPorcentajeAnterior)
         }
     }
 
     /** */
     fun initCalculosNecesarios() {
-
+        val recuperarPorcentajeAnterior = savePorcentaje.getPorcentaje()
         //Valores obtenidos de los campos
         val montoTotal: Double? = inputMontoTotal.text.toString().toDoubleOrNull()
         val propinaSeleccionada = when (radioBtnGroupPorcentaje.checkedRadioButtonId) {
@@ -77,7 +90,13 @@ class MainActivity : AppCompatActivity() {
             R.id.rBtn_personalizado -> txtPropinaPersonalizada.text.toString().toDoubleOrNull()
                 ?: 0.0
 
-            else -> 0.0
+            else -> {
+                if (recuperarPorcentajeAnterior != 0f) {
+                    recuperarPorcentajeAnterior.toDouble()
+                } else {
+                    0.0
+                }
+            }
         }
 
         //Si se activara el modo propina personalizada
@@ -85,13 +104,13 @@ class MainActivity : AppCompatActivity() {
             if (txtPropinaPersonalizada.text.toString().toDoubleOrNull() == null) {
                 message("Ingrese un monto personalizado")
                 return
-            }
+            }/*
             if (txtPropinaPersonalizada.text.toString()
                     .toDouble() < 5 || txtPropinaPersonalizada.text.toString().toDouble() > 99
             ) {
                 message("Ingrese entre 5 y 99")
                 return
-            }
+            }*/
         }
 
         //Calculos totales  y de propina
@@ -110,8 +129,10 @@ class MainActivity : AppCompatActivity() {
             //Asigna resultados a los campos
             txtPropina.text = textPropina
             txtTotalFinal.text = textTotalFinal
-            txtTotalFinal.visibility = TextView.VISIBLE
-            txtPropina.visibility = TextView.VISIBLE
+            /*txtTotalFinal.visibility = TextView.VISIBLE
+            txtPropina.visibility = TextView.VISIBLE*/
+            showViewWithFade(txtTotalFinal)
+            showViewWithFade(txtPropina)
         }
         //Guardamos la propina seleccionada
         savePorcentaje.savePorcentaje(propinaSeleccionada)
@@ -124,12 +145,14 @@ class MainActivity : AppCompatActivity() {
             when (checkedId) {
                 R.id.rBtn_personalizado -> {
                     optionPersonalizada = true
-                    txtPropinaPersonalizada.visibility = TextView.VISIBLE
+                    //txtPropinaPersonalizada.visibility = TextView.VISIBLE
+                    showViewWithFade(txtPropinaPersonalizada)
                 }
 
                 else -> {
                     optionPersonalizada = false
-                    txtPropinaPersonalizada.visibility = TextView.GONE
+                    //txtPropinaPersonalizada.visibility = TextView.GONE
+                    hideViewWithFade(txtPropinaPersonalizada)
                 }
             }
         }
@@ -139,15 +162,44 @@ class MainActivity : AppCompatActivity() {
     fun limpiarCampos() {
         inputMontoTotal.text.clear()
         radioBtnGroupPorcentaje.clearCheck()
-        txtPropina.text = "Propina: $0.00"
+        /*txtPropina.text = "Propina: $0.00"
         txtTotalFinal.text = "Total a pagar: $0.00"
         txtTotalFinal.visibility = TextView.GONE
         txtPropina.visibility = TextView.GONE
-        txtPropinaPersonalizada.visibility = TextView.GONE
+        txtPropinaPersonalizada.visibility = TextView.GONE*/
+
+        hideViewWithFade(txtTotalFinal)
+        hideViewWithFade(txtPropina)
     }
 
     /**Para mostrar mensajes al usuario*/
     fun message(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
     }
+
+    /** Muestra una vista con una animación de fade-in.
+     * Si la vista ya es visible, simplemente la asegura.*/
+    private fun showViewWithFade(view: View) {
+        if (view.visibility != View.VISIBLE) {
+            view.visibility = View.VISIBLE
+            view.startAnimation(fadeInAnimation)
+        }
+    }
+
+    /**Oculta una vista con una animacion de fade-out.
+     * La vista se establece a GONE una vez que la animacion termina.*/
+    private fun hideViewWithFade(view: View) {
+        if (view.isVisible) {
+            val currentFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
+            currentFadeOutAnimation.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
+                override fun onAnimationEnd(animation: Animation?) {
+                    view.visibility = View.GONE
+                }
+                override fun onAnimationRepeat(animation: Animation?) {}
+            })
+            view.startAnimation(currentFadeOutAnimation)
+        }
+    }
+
 }
