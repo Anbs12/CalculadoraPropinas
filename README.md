@@ -38,4 +38,4 @@ de propina seleccionado.
  - Validar que el monto ingresado sea válido ✅
  - Permitir propinas personalizadas ✅
  - Guardar la preferencia de porcentaje usando SharedPreferences ✅
- - Agregar animaciones suaves ❌
+ - Agregar animaciones suaves ✅
