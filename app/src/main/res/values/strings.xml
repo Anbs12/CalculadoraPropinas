@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">DefLatam_CalculadoraPropinas</string>
+    <string name="tip_calculator_title">Calculadora Propinas</string>
+    <string name="previous_tip_percentage">Tu anterior porcentaje fue: </string>
+    <string name="enter_total_label">Ingrese total</string>
+    <string name="enter_total_hint">Ingrese monto</string>
+    <string name="tip_percentage_label">Procentaje de propina</string>
+    <string name="tip_10_percent">10%</string>
+    <string name="tip_15_percent">15%</string>
+    <string name="tip_20_percent">20%</string>
+    <string name="tip_custom_option">¿Otro?</string>
+    <string name="custom_tip_hint">ej: 18</string>
+    <string name="calculate_button">Calcular</string>
+    <string name="clear_button">Limpiar</string>
+    <string name="tip_label">Propina:</string>
+    <string name="total_label">Total:</string>
+    <string name="placeholder_amount">$0.00</string>
 </resources>

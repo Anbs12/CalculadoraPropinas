@@ -29,7 +29,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Calculadora Propinas"
+                android:text="@string/tip_calculator_title"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:layout_gravity="center_horizontal"
@@ -40,30 +40,32 @@
                 android:id="@+id/txtAnteriorPorcentaje"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tu anterior porcentaje fue: "
+                android:text="@string/previous_tip_percentage"
                 android:visibility="gone"/>
 
             <!-- Monto toal Input -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ingrese total"
+                android:text="@string/enter_total_label"
                 android:textSize="16sp"
                 android:layout_marginBottom="4dp"/>
             <EditText
                 android:id="@+id/inputMontoTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ingrese monto"
+                android:hint="@string/enter_total_hint"
                 android:inputType="numberDecimal"
                 android:padding="12dp"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+                android:maxLength="9"
+                tools:ignore="Autofill" />
 
             <!-- Propina porcentaje Selection -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Procentaje de propina"
+                android:text="@string/tip_percentage_label"
                 android:textSize="16sp"
                 android:layout_marginBottom="4dp"/>
             <RadioGroup
@@ -78,25 +80,25 @@
                     android:id="@+id/rBtn_10"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10%" />
+                    android:text="@string/tip_10_percent" />
 
                 <RadioButton
                     android:id="@+id/rBtn_15"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="15%" />
+                    android:text="@string/tip_15_percent" />
 
                 <RadioButton
                     android:id="@+id/rBtn_20"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="20%" />
+                    android:text="@string/tip_20_percent" />
 
                 <RadioButton
                     android:id="@+id/rBtn_personalizado"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="¿Otro?" />
+                    android:text="@string/tip_custom_option" />
             </RadioGroup>
 
             <!-- Propina personalizada Input Field -->
@@ -104,14 +106,17 @@
                 android:id="@+id/edTxtCantidadPorcentajePersonalizada"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="ej: 18"
+                android:hint="@string/custom_tip_hint"
                 android:inputType="number"
                 android:padding="12dp"
                 android:visibility="gone"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+                android:maxLength="2"
+                tools:ignore="Autofill" />
 
             <!-- Calcular limpiar Buttons -->
             <LinearLayout
+                style="?android:attr/buttonBarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -119,20 +124,22 @@
 
                 <Button
                     android:id="@+id/btnCalcular"
+                    style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Calcular"
+                    android:text="@string/calculate_button"
                     android:backgroundTint="#4CAF50"
                     android:textColor="@android:color/white"
-                    android:layout_marginEnd="8dp"/>
+                    android:layout_marginEnd="8dp" />
 
                 <Button
                     android:id="@+id/btnLimpiar"
+                    style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Limpiar"
+                    android:text="@string/clear_button"
                     android:backgroundTint="#E0E0E0"
                     android:textColor="@android:color/black"
                     android:layout_marginStart="8dp"/>
@@ -140,15 +147,17 @@
 
             <!-- propina Result -->
             <LinearLayout
+                android:id="@+id/propina_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="8dp"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Propina"
+                    android:text="@string/tip_label"
                     android:textSize="16sp"/>
 
                 <View
@@ -160,7 +169,7 @@
                     android:id="@+id/txtPropina"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="$0.00"
+                    android:text="@string/placeholder_amount"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:gravity="end"
@@ -169,14 +178,16 @@
 
             <!-- Total  Result -->
             <LinearLayout
+                android:id="@+id/total_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total"
+                    android:text="@string/total_label"
                     android:textSize="18sp"
                     android:textStyle="bold"/>
 
@@ -189,7 +200,7 @@
                     android:id="@+id/txtTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="$0.00"
+                    android:text="@string/placeholder_amount"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:gravity="end"
