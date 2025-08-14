@@ -2,29 +2,21 @@ package com.example.deflatam_calculadorapropinas
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Button
-import android.widget.EditText
-import android.widget.RadioGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import com.example.deflatam_calculadorapropinas.databinding.ActivityMainBinding
 import com.example.deflatam_calculadorapropinas.utils.CalculadoraUtils
 import com.example.deflatam_calculadorapropinas.utils.SavePorcentaje
-import androidx.core.view.isVisible
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var inputMontoTotal: EditText
-    private lateinit var radioBtnGroupPorcentaje: RadioGroup
-    private lateinit var txtPropina: TextView
-    private lateinit var txtTotalFinal: TextView
-    private lateinit var txtPropinaPersonalizada: TextView
-    private lateinit var txtPorcentajeAnterior: TextView
-    private lateinit var btnCalcular: Button
-    private lateinit var btnLimpiar: Button
+    private lateinit var binding: ActivityMainBinding
+
     private lateinit var calculadoraUtils: CalculadoraUtils
     private lateinit var savePorcentaje: SavePorcentaje
     private var optionPersonalizada = false
@@ -35,145 +27,150 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Carga de las animaciones
-        fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
-        fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
-
+        cargaAnimaciones()
         initComponents()
         radioBtnListenerPropinaPersonalizada()
         mostrarPorcentajeAnterior()
 
-        btnCalcular.setOnClickListener {
+    }
+
+    private fun initComponents() {
+        calculadoraUtils = CalculadoraUtils()
+        savePorcentaje = SavePorcentaje(this)
+
+        binding.btnCalcular.setOnClickListener {
             initCalculosNecesarios()
         }
-        btnLimpiar.setOnClickListener {
+        binding.btnLimpiar.setOnClickListener {
             limpiarCampos()
         }
     }
 
-    fun initComponents() {
-        inputMontoTotal = findViewById(R.id.inputMontoTotal)
-        radioBtnGroupPorcentaje = findViewById(R.id.radioBtnGroup_Porcentaje)
-        txtPropina = findViewById(R.id.txtPropina)
-        txtTotalFinal = findViewById(R.id.txtTotal)
-        txtPropinaPersonalizada = findViewById(R.id.edTxtCantidadPorcentajePersonalizada)
-        txtPorcentajeAnterior = findViewById(R.id.txtAnteriorPorcentaje)
-        btnCalcular = findViewById(R.id.btnCalcular)
-        btnLimpiar = findViewById(R.id.btnLimpiar)
-        calculadoraUtils = CalculadoraUtils()
-        savePorcentaje = SavePorcentaje(this)
+    private fun cargaAnimaciones() {
+        // Carga de las animaciones
+        fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
     }
 
     /** Muestra el porcentaje anterior guardado en SharedPreferences */
     @SuppressLint("SetTextI18n")
-    fun mostrarPorcentajeAnterior(){
+    private fun mostrarPorcentajeAnterior() {
         val porcentajeAnterior = savePorcentaje.getPorcentaje()
         if (porcentajeAnterior != 0f) {
-            txtPorcentajeAnterior.text = "Tu anterior propina fue de: $porcentajeAnterior%"
-            //txtPorcentajeAnterior.visibility = TextView.VISIBLE
-            showViewWithFade(txtPorcentajeAnterior)
+            binding.txtAnteriorPorcentaje.text = "Tu anterior propina fue de: $porcentajeAnterior%"
+            showViewWithFade(binding.txtAnteriorPorcentaje)
         }
     }
 
-    /** */
-    fun initCalculosNecesarios() {
-        val recuperarPorcentajeAnterior = savePorcentaje.getPorcentaje()
-        //Valores obtenidos de los campos
-        val montoTotal: Double? = inputMontoTotal.text.toString().toDoubleOrNull()
-        val propinaSeleccionada = when (radioBtnGroupPorcentaje.checkedRadioButtonId) {
-            R.id.rBtn_10 -> 10.0
-            R.id.rBtn_15 -> 15.0
-            R.id.rBtn_20 -> 20.0
-            R.id.rBtn_personalizado -> txtPropinaPersonalizada.text.toString().toDoubleOrNull()
-                ?: 0.0
+    /** Inicia los calculos luego al presionar el boton calcular*/
+    private fun initCalculosNecesarios() {
 
-            else -> {
-                if (recuperarPorcentajeAnterior != 0f) {
-                    recuperarPorcentajeAnterior.toDouble()
-                } else {
-                    0.0
-                }
-            }
-        }
+        //Valores obtenidos de los campos
+        val montoTotal: Double? = binding.inputMontoTotal.text.toString().toDoubleOrNull()
+        val propinaSeleccionada = getPropinaSeleccionada()
 
         //Si se activara el modo propina personalizada
-        if (optionPersonalizada == true) {
-            if (txtPropinaPersonalizada.text.toString().toDoubleOrNull() == null) {
-                message("Ingrese un monto personalizado")
-                return
-            }/*
-            if (txtPropinaPersonalizada.text.toString()
-                    .toDouble() < 5 || txtPropinaPersonalizada.text.toString().toDouble() > 99
-            ) {
-                message("Ingrese entre 5 y 99")
-                return
-            }*/
-        }
+        modoPropinaPersonalizada()
 
-        //Calculos totales  y de propina
-        if (montoTotal == null) {
-            message("Ingrese un monto total")
-        } else {
-            //Obtenemos resultados
-            val textPropina =
-                "Propina: $${calculadoraUtils.calcularPropina(montoTotal, propinaSeleccionada)}"
-            val textTotalFinal = "Total a pagar: $${
-                calculadoraUtils.calcularTotalFinal(
-                    montoTotal,
-                    calculadoraUtils.calcularPropina(montoTotal, propinaSeleccionada)
-                )
-            }"
-            //Asigna resultados a los campos
-            txtPropina.text = textPropina
-            txtTotalFinal.text = textTotalFinal
-            /*txtTotalFinal.visibility = TextView.VISIBLE
-            txtPropina.visibility = TextView.VISIBLE*/
-            showViewWithFade(txtTotalFinal)
-            showViewWithFade(txtPropina)
-        }
+        //Rellena los campos
+        calculosTotalesYpropina(montoTotal = montoTotal, propina = propinaSeleccionada)
+
         //Guardamos la propina seleccionada
         savePorcentaje.savePorcentaje(propinaSeleccionada)
         mostrarPorcentajeAnterior()
     }
 
+    private fun modoPropinaPersonalizada(){
+        if (optionPersonalizada) {
+            if (binding.edTxtCantidadPorcentajePersonalizada.text.toString()
+                    .toDoubleOrNull() == null
+            ) {
+                message("Ingrese un monto personalizado")
+                return
+            }
+        }
+    }
+
+    /**Calcula y asigna los resultados a los campos de texto*/
+    private fun calculosTotalesYpropina(montoTotal: Double?, propina: Double) {
+        //Calculos totales  y de propina
+        try {
+
+            if (montoTotal != null) {
+                //Obtenemos resultados
+                val textPropina = "$${calculadoraUtils.calcularPropina(montoTotal, propina)}"
+                val textTotalFinal = "$${
+                    calculadoraUtils.calcularTotalFinal(
+                        montoTotal,
+                        calculadoraUtils.calcularPropina(montoTotal, propina)
+                    )
+                }"
+                //Asigna resultados a los campos
+                binding.txtPropina.text = textPropina
+                binding.txtTotal.text = textTotalFinal
+                showViewWithFade(binding.txtPropina)
+                showViewWithFade(binding.txtTotal)
+                showViewWithFade(binding.propinaLayout)
+                showViewWithFade(binding.totalLayout)
+            } else {
+                message("Ingrese un monto total")
+            }
+
+        } catch (e: Exception) {
+            Log.e("Error", "Error al calcular ${e.message}")
+            message("Error al calcular")
+        }
+    }
+
+    /** retorna el monto de la propina seleccionada*/
+    private fun getPropinaSeleccionada(): Double {
+        return when (binding.radioBtnGroupPorcentaje.checkedRadioButtonId) {
+            R.id.rBtn_10 -> 10.0
+            R.id.rBtn_15 -> 15.0
+            R.id.rBtn_20 -> 20.0
+            R.id.rBtn_personalizado -> binding.edTxtCantidadPorcentajePersonalizada.text.toString()
+                .toDoubleOrNull()
+                ?: 0.0
+
+            else -> {
+                savePorcentaje.getPorcentaje().toDouble()
+            }
+        }
+    }
+
     /**Controla la  visibilidad del campo de propina personalizada*/
-    fun radioBtnListenerPropinaPersonalizada() {
-        radioBtnGroupPorcentaje.setOnCheckedChangeListener { _, checkedId ->
+    private fun radioBtnListenerPropinaPersonalizada() {
+        binding.radioBtnGroupPorcentaje.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rBtn_personalizado -> {
                     optionPersonalizada = true
-                    //txtPropinaPersonalizada.visibility = TextView.VISIBLE
-                    showViewWithFade(txtPropinaPersonalizada)
+                    showViewWithFade(binding.edTxtCantidadPorcentajePersonalizada)
                 }
 
                 else -> {
                     optionPersonalizada = false
-                    //txtPropinaPersonalizada.visibility = TextView.GONE
-                    hideViewWithFade(txtPropinaPersonalizada)
+                    hideViewWithFade(binding.edTxtCantidadPorcentajePersonalizada)
                 }
             }
         }
     }
 
     @SuppressLint("SetTextI18n")
-    fun limpiarCampos() {
-        inputMontoTotal.text.clear()
-        radioBtnGroupPorcentaje.clearCheck()
-        /*txtPropina.text = "Propina: $0.00"
-        txtTotalFinal.text = "Total a pagar: $0.00"
-        txtTotalFinal.visibility = TextView.GONE
-        txtPropina.visibility = TextView.GONE
-        txtPropinaPersonalizada.visibility = TextView.GONE*/
+    private fun limpiarCampos() {
+        binding.inputMontoTotal.text.clear()
+        binding.radioBtnGroupPorcentaje.clearCheck()
 
-        hideViewWithFade(txtTotalFinal)
-        hideViewWithFade(txtPropina)
+        hideViewWithFade(binding.txtTotal)
+        hideViewWithFade(binding.txtPropina)
+        hideViewWithFade(binding.propinaLayout)
+        hideViewWithFade(binding.totalLayout)
     }
 
     /**Para mostrar mensajes al usuario*/
-    fun message(text: String) {
+    private fun message(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
     }
 
@@ -196,6 +193,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onAnimationEnd(animation: Animation?) {
                     view.visibility = View.GONE
                 }
+
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
             view.startAnimation(currentFadeOutAnimation)
